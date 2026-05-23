@@ -2,5 +2,6 @@
     <string name="app_name">EnglishWords</string>
     <string name="button_skip">Пропустить</string>
     <string name="title_correct">Верно!</string>
+    <string name="title_wrong">Неверно!</string>
     <string name="button_continue">Продолжить</string>
 </resources>
