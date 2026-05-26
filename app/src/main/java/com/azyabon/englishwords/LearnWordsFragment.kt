@@ -19,6 +19,9 @@ class LearnWordsFragment : Fragment() {
         get() = _binding
             ?: throw IllegalStateException("View binding is only valid between onCreate and onDestroy")
     private var timer: CountDownTimer? = null
+    private var learnedWordsCount = 0
+    private var totalWordsCount = 0
+    private var isAnswered = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -36,13 +39,13 @@ class LearnWordsFragment : Fragment() {
         val trainer = LearnWordsTrainer()
         showNextQuestion(trainer)
 
-        timer = object : CountDownTimer(60000, 1000) {
+        timer = object : CountDownTimer(5000, 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 binding.tvTimer.text = "${millisUntilFinished / 1000}s"
             }
 
             override fun onFinish() {
-                parentFragmentManager.popBackStack()
+                openTrainingResult()
             }
         }.start()
 
@@ -69,6 +72,9 @@ class LearnWordsFragment : Fragment() {
 
     private fun showNextQuestion(trainer: LearnWordsTrainer) {
         val firstQuestion: Question? = trainer.getNextQuestion()
+        isAnswered = false
+        totalWordsCount++
+
         with(binding) {
             if (firstQuestion == null || firstQuestion.variants.size < NUMBER_OF_ANSWERS) {
                 tvCurrentWord.isVisible = false
@@ -90,8 +96,12 @@ class LearnWordsFragment : Fragment() {
                 tvVariantNumber4.text = "4"
 
                 llAnswer1.setOnClickListener {
+                    if (isAnswered) return@setOnClickListener
+                    isAnswered = true
+
                     if (trainer.checkAnswer(0)) {
                         markAnswerCorrect(llAnswer1, tvVariantNumber1, tvVariantValue1)
+                        learnedWordsCount++
                         showResult(true)
                     } else {
                         markAnswerWrong(llAnswer1, tvVariantNumber1, tvVariantValue1)
@@ -100,8 +110,12 @@ class LearnWordsFragment : Fragment() {
                 }
 
                 llAnswer2.setOnClickListener {
+                    if (isAnswered) return@setOnClickListener
+                    isAnswered = true
+
                     if (trainer.checkAnswer(1)) {
                         markAnswerCorrect(llAnswer2, tvVariantNumber2, tvVariantValue2)
+                        learnedWordsCount++
                         showResult(true)
                     } else {
                         markAnswerWrong(llAnswer2, tvVariantNumber2, tvVariantValue2)
@@ -110,8 +124,12 @@ class LearnWordsFragment : Fragment() {
                 }
 
                 llAnswer3.setOnClickListener {
+                    if (isAnswered) return@setOnClickListener
+                    isAnswered = true
+
                     if (trainer.checkAnswer(2)) {
                         markAnswerCorrect(llAnswer3, tvVariantNumber3, tvVariantValue3)
+                        learnedWordsCount++
                         showResult(true)
                     } else {
                         markAnswerWrong(llAnswer3, tvVariantNumber3, tvVariantValue3)
@@ -120,8 +138,12 @@ class LearnWordsFragment : Fragment() {
                 }
 
                 llAnswer4.setOnClickListener {
+                    if (isAnswered) return@setOnClickListener
+                    isAnswered = true
+
                     if (trainer.checkAnswer(3)) {
                         markAnswerCorrect(llAnswer4, tvVariantNumber4, tvVariantValue4)
+                        learnedWordsCount++
                         showResult(true)
                     } else {
                         markAnswerWrong(llAnswer4, tvVariantNumber4, tvVariantValue4)
@@ -249,6 +271,19 @@ class LearnWordsFragment : Fragment() {
             tvResultMessage.text = messageText
             ivResultIcon.setImageResource(resultIconResource)
         }
+    }
+
+    private fun openTrainingResult() {
+        timer?.cancel()
+        timer = null
+
+        parentFragmentManager.beginTransaction()
+            .replace(
+                R.id.flContainer,
+                TrainingResultFragment.newInstance(learnedWordsCount, totalWordsCount)
+            )
+            .addToBackStack(null)
+            .commit()
     }
 
     override fun onDestroyView() {

@@ -12,12 +12,12 @@
     </style>
     <style name="TextViewOriginalWordStyle" parent="TextAppearance.AppCompat">
         <item name="android:fontFamily">@font/nunito_bold</item>
-        <item name="android:textColor">@color/textVariantsColor</item>
+        <item name="android:textColor">@color/black</item>
         <item name="android:textSize">16sp</item>
     </style>
     <style name="TextViewTranslateWordStyle" parent="TextAppearance.AppCompat">
         <item name="android:fontFamily">@font/nunito_semi_bold</item>
-        <item name="android:textColor">@color/textVariantsColor</item>
+        <item name="android:textColor">@color/black</item>
         <item name="android:textSize">16sp</item>
     </style>
 </resources>
