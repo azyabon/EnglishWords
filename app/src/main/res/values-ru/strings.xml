@@ -4,4 +4,5 @@
     <string name="title_correct">Верно!</string>
     <string name="title_wrong">Неверно!</string>
     <string name="button_continue">Продолжить</string>
+    <string name="learned_words">Выученные слова</string>
 </resources>

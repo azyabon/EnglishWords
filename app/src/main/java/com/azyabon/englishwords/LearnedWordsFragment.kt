@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.azyabon.englishwords.databinding.FragmentLearnedWordsBinding
 
 class LearnedWordsFragment : Fragment() {
@@ -13,6 +14,7 @@ class LearnedWordsFragment : Fragment() {
     private val binding
         get() = _binding
             ?: throw IllegalStateException("View binding is only valid between onCreate and onDestroy")
+    private lateinit var learnedWords: List<Word>
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -26,10 +28,12 @@ class LearnedWordsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val learnedWords = WordsRepository.getLearnedWords()
+        learnedWords = WordsRepository.getLearnedWords()
 
         with(binding) {
-            testTvWords.text = learnedWords.joinToString(separator = "\n") { "${it.original} - ${it.translate}" }
+            rvLearnedWords.layoutManager = LinearLayoutManager(requireContext())
+            rvLearnedWords.setHasFixedSize(true)
+            rvLearnedWords.adapter = LearnedWordsAdapter(learnedWords)
         }
     }
 
