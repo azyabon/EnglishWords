@@ -4,8 +4,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".HomeFragment"
-    android:padding="20dp">
+    tools:context=".HomeFragment">
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/themes"
+        android:layout_marginTop="20dp"
+        android:textSize="24sp"
+        style="@style/TextViewScreenTitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <android.widget.Button
         android:id="@+id/btnStart"
@@ -15,6 +26,7 @@
         android:backgroundTint="#2574FF"
         android:fontFamily="@font/nunito_bold"
         android:text="Start"
+        android:layout_marginHorizontal="20dp"
         android:textAllCaps="true"
         android:textColor="@color/white"
         android:visibility="visible"

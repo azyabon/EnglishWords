@@ -22,6 +22,16 @@ class LearnWordsFragment : Fragment() {
     private var learnedWordsCount = 0
     private var totalWordsCount = 0
     private var isAnswered = false
+    private lateinit var answerViews: List<AnswerView>
+    private data class AnswerView(
+        val container: LinearLayout,
+        val number: TextView,
+        val value: TextView,
+    )
+    data class TrainingStats(
+        var learnedCount: Int = 0,
+        var totalCount: Int = 0,
+    )
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -36,7 +46,15 @@ class LearnWordsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        answerViews = listOf(
+            AnswerView(binding.llAnswer1, binding.tvVariantNumber1, binding.tvVariantValue1),
+            AnswerView(binding.llAnswer2, binding.tvVariantNumber2, binding.tvVariantValue2),
+            AnswerView(binding.llAnswer3, binding.tvVariantNumber3, binding.tvVariantValue3),
+            AnswerView(binding.llAnswer4, binding.tvVariantNumber4, binding.tvVariantValue4),
+        )
+
         val trainer = LearnWordsTrainer()
+
         showNextQuestion(trainer)
 
         timer = object : CountDownTimer(5000, 1000) {
@@ -52,10 +70,7 @@ class LearnWordsFragment : Fragment() {
         with(binding) {
             btnContinue.setOnClickListener {
                 clResult.isVisible = false
-                markAnswerNeutral(llAnswer1, tvVariantNumber1, tvVariantValue1)
-                markAnswerNeutral(llAnswer2, tvVariantNumber2, tvVariantValue2)
-                markAnswerNeutral(llAnswer3, tvVariantNumber3, tvVariantValue3)
-                markAnswerNeutral(llAnswer4, tvVariantNumber4, tvVariantValue4)
+                answerViews.forEach { markAnswerNeutral(it) }
 
                 showNextQuestion(trainer)
             }
@@ -67,6 +82,25 @@ class LearnWordsFragment : Fragment() {
             btnSkip.setOnClickListener {
                 showNextQuestion(trainer)
             }
+        }
+    }
+
+    private fun onAnswerClick(
+        answerIndex: Int,
+        answerView: AnswerView,
+        trainer: LearnWordsTrainer,
+    ) {
+        if (isAnswered) return
+
+        isAnswered = true
+
+        if (trainer.checkAnswer(answerIndex)) {
+            markAnswerCorrect(answerView)
+            learnedWordsCount++
+            showResult(true)
+        } else {
+            markAnswerWrong(answerView)
+            showResult(false)
         }
     }
 
@@ -85,69 +119,14 @@ class LearnWordsFragment : Fragment() {
                 tvCurrentWord.isVisible = true
                 tvCurrentWord.text = firstQuestion.correctAnswer.original
 
-                tvVariantValue1.text = firstQuestion.variants[0].translate
-                tvVariantValue2.text = firstQuestion.variants[1].translate
-                tvVariantValue3.text = firstQuestion.variants[2].translate
-                tvVariantValue4.text = firstQuestion.variants[3].translate
-
-                tvVariantNumber1.text = "1"
-                tvVariantNumber2.text = "2"
-                tvVariantNumber3.text = "3"
-                tvVariantNumber4.text = "4"
-
-                llAnswer1.setOnClickListener {
-                    if (isAnswered) return@setOnClickListener
-                    isAnswered = true
-
-                    if (trainer.checkAnswer(0)) {
-                        markAnswerCorrect(llAnswer1, tvVariantNumber1, tvVariantValue1)
-                        learnedWordsCount++
-                        showResult(true)
-                    } else {
-                        markAnswerWrong(llAnswer1, tvVariantNumber1, tvVariantValue1)
-                        showResult(false)
-                    }
+                answerViews.forEachIndexed { index, answerView ->
+                    answerView.number.text = "${index + 1}"
+                    answerView.value.text = firstQuestion.variants[index].translate
                 }
 
-                llAnswer2.setOnClickListener {
-                    if (isAnswered) return@setOnClickListener
-                    isAnswered = true
-
-                    if (trainer.checkAnswer(1)) {
-                        markAnswerCorrect(llAnswer2, tvVariantNumber2, tvVariantValue2)
-                        learnedWordsCount++
-                        showResult(true)
-                    } else {
-                        markAnswerWrong(llAnswer2, tvVariantNumber2, tvVariantValue2)
-                        showResult(false)
-                    }
-                }
-
-                llAnswer3.setOnClickListener {
-                    if (isAnswered) return@setOnClickListener
-                    isAnswered = true
-
-                    if (trainer.checkAnswer(2)) {
-                        markAnswerCorrect(llAnswer3, tvVariantNumber3, tvVariantValue3)
-                        learnedWordsCount++
-                        showResult(true)
-                    } else {
-                        markAnswerWrong(llAnswer3, tvVariantNumber3, tvVariantValue3)
-                        showResult(false)
-                    }
-                }
-
-                llAnswer4.setOnClickListener {
-                    if (isAnswered) return@setOnClickListener
-                    isAnswered = true
-
-                    if (trainer.checkAnswer(3)) {
-                        markAnswerCorrect(llAnswer4, tvVariantNumber4, tvVariantValue4)
-                        learnedWordsCount++
-                        showResult(true)
-                    } else {
-                        markAnswerWrong(llAnswer4, tvVariantNumber4, tvVariantValue4)
-                        showResult(false)
+                answerViews.forEachIndexed { index, answerView ->
+                    answerView.container.setOnClickListener {
+                        onAnswerClick(index, answerView, trainer)
                     }
                 }
             }
@@ -155,18 +134,14 @@ class LearnWordsFragment : Fragment() {
 
     }
 
-    private fun markAnswerNeutral(
-        llAnswer: LinearLayout,
-        tvVariantNumber: TextView,
-        tvVariantValue: TextView,
-    ) {
+    private fun markAnswerNeutral(answerView: AnswerView) {
 
-        llAnswer.background = ContextCompat.getDrawable(
+        answerView.container.background = ContextCompat.getDrawable(
             requireContext(),
             R.drawable.shape_rounded_containers
         )
 
-        tvVariantNumber.apply {
+        answerView.number.apply {
             background = ContextCompat.getDrawable(
                 requireContext(),
                 R.drawable.shape_rounded_variants
@@ -180,7 +155,7 @@ class LearnWordsFragment : Fragment() {
             )
         }
 
-        tvVariantValue.setTextColor(
+        answerView.value.setTextColor(
             ContextCompat.getColor(
                 requireContext(),
                 R.color.textVariantsColor
@@ -188,29 +163,25 @@ class LearnWordsFragment : Fragment() {
         )
     }
 
-    private fun markAnswerWrong(
-        llAnswer: LinearLayout,
-        tvVariantNumber: TextView,
-        tvVariantValue: TextView,
-    ) {
-        llAnswer.background = ContextCompat.getDrawable(
+    private fun markAnswerWrong(answerView: AnswerView) {
+        answerView.container.background = ContextCompat.getDrawable(
             requireContext(),
             R.drawable.shape_rounded_containers_wrong
         )
 
-        tvVariantNumber.background = ContextCompat.getDrawable(
+        answerView.number.background = ContextCompat.getDrawable(
             requireContext(),
             R.drawable.shape_rounded_variants_wrong
         )
 
-        tvVariantNumber.setTextColor(
+        answerView.number.setTextColor(
             ContextCompat.getColor(
                 requireContext(),
                 R.color.white
             )
         )
 
-        tvVariantValue.setTextColor(
+        answerView.value.setTextColor(
             ContextCompat.getColor(
                 requireContext(),
                 R.color.wrongAnswerColor
@@ -218,29 +189,25 @@ class LearnWordsFragment : Fragment() {
         )
     }
 
-    private fun markAnswerCorrect(
-        llAnswer: LinearLayout,
-        tvVariantNumber: TextView,
-        tvVariantValue: TextView,
-    ) {
-        llAnswer.background = ContextCompat.getDrawable(
+    private fun markAnswerCorrect(answerView: AnswerView) {
+        answerView.container.background = ContextCompat.getDrawable(
             requireContext(),
             R.drawable.shape_rounded_containers_correct
         )
 
-        tvVariantNumber.background = ContextCompat.getDrawable(
+        answerView.number.background = ContextCompat.getDrawable(
             requireContext(),
             R.drawable.shape_rounded_variants_correct
         )
 
-        tvVariantNumber.setTextColor(
+        answerView.number.setTextColor(
             ContextCompat.getColor(
                 requireContext(),
                 R.color.white
             )
         )
 
-        tvVariantValue.setTextColor(
+        answerView.value.setTextColor(
             ContextCompat.getColor(
                 requireContext(),
                 R.color.correctAnswerColor
