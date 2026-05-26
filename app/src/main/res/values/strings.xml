@@ -4,4 +4,6 @@
     <string name="title_correct">Correct!</string>
     <string name="title_wrong">Wrong!</string>
     <string name="button_continue">Continue</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

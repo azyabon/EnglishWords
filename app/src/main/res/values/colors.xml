@@ -5,4 +5,5 @@
     <color name="textVariantsColor">#888992</color>
     <color name="correctAnswerColor">#0EAD69</color>
     <color name="wrongAnswerColor">#FA4169</color>
+    <color name="primaryColor">#2574FF</color>
 </resources>
