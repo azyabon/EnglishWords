@@ -1,6 +1,14 @@
 package com.azyabon.englishwords
 
+data class Topic(
+    val id: String,
+    val title: String,
+    val icon: Int,
+    val words: List<Word>,
+)
+
 data class Word(
+    val id: String,
     val original: String,
     val translate: String,
     var learned: Boolean = false,
@@ -11,29 +19,25 @@ data class Question(
     val correctAnswer: Word,
 )
 
-class LearnWordsTrainer {
+class LearnWordsTrainer(topicId: String) {
 
-    private val dictionary = WordsRepository.dictionary
+    private val dictionary = WordsRepository.getWordsByTopicId(topicId)
 
     private var currentQuestion: Question? = null
 
     fun getNextQuestion(): Question? {
-
         val notLearnedList = dictionary.filter { !it.learned }
 
         if (notLearnedList.isEmpty()) return null
 
-        val questionWords =
-            if (notLearnedList.size < NUMBER_OF_ANSWERS) {
-                val learnedList = dictionary.filter { it.learned }.shuffled()
-                notLearnedList.shuffled()
-                    .take(NUMBER_OF_ANSWERS) + learnedList
-                    .take(NUMBER_OF_ANSWERS - notLearnedList.size)
-            } else {
-                notLearnedList.shuffled().take(NUMBER_OF_ANSWERS)
-            }.shuffled()
+        val correctAnswer = notLearnedList.random()
 
-        val correctAnswer = questionWords.random()
+        val wrongAnswers = dictionary
+            .filter { it.id != correctAnswer.id }
+            .shuffled()
+            .take(NUMBER_OF_ANSWERS - 1)
+
+        val questionWords = (wrongAnswers + correctAnswer).shuffled()
 
         currentQuestion = Question(
             variants = questionWords,

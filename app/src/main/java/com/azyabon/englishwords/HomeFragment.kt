@@ -1,10 +1,11 @@
 package com.azyabon.englishwords
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.GridLayoutManager
 import com.azyabon.englishwords.databinding.FragmentHomeBinding
 
 class HomeFragment : Fragment() {
@@ -27,13 +28,19 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        with(binding) {
-            btnStart.setOnClickListener {
-                parentFragmentManager.beginTransaction()
-                    .replace(R.id.flContainer, LearnWordsFragment())
-                    .addToBackStack(null)
-                    .commit()
-            }
+        binding.rvTopics.apply {
+            val topicAdapter = TopicsAdapter(
+                topics = WordsRepository.getTopics(),
+                onItemClick = { topicId ->
+                    parentFragmentManager.beginTransaction()
+                        .replace(R.id.flContainer, LearnWordsFragment.newInstance(topicId))
+                        .addToBackStack(null)
+                        .commit()
+                }
+            )
+
+            layoutManager = GridLayoutManager(requireContext(), 2)
+            adapter = topicAdapter
         }
     }
 

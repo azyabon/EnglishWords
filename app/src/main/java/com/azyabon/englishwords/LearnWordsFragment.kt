@@ -28,10 +28,18 @@ class LearnWordsFragment : Fragment() {
         val number: TextView,
         val value: TextView,
     )
-    data class TrainingStats(
-        var learnedCount: Int = 0,
-        var totalCount: Int = 0,
-    )
+
+    companion object {
+        private const val ARG_TOPIC_ID = "ARG_TOPIC_ID"
+
+        fun newInstance(topicId: String): LearnWordsFragment {
+            return LearnWordsFragment().apply {
+                arguments = Bundle().apply {
+                    putString(ARG_TOPIC_ID, topicId)
+                }
+            }
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -46,6 +54,8 @@ class LearnWordsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val topicId: String = arguments?.getString(ARG_TOPIC_ID) ?: ""
+
         answerViews = listOf(
             AnswerView(binding.llAnswer1, binding.tvVariantNumber1, binding.tvVariantValue1),
             AnswerView(binding.llAnswer2, binding.tvVariantNumber2, binding.tvVariantValue2),
@@ -53,11 +63,11 @@ class LearnWordsFragment : Fragment() {
             AnswerView(binding.llAnswer4, binding.tvVariantNumber4, binding.tvVariantValue4),
         )
 
-        val trainer = LearnWordsTrainer()
+        val trainer = LearnWordsTrainer(topicId)
 
         showNextQuestion(trainer)
 
-        timer = object : CountDownTimer(5000, 1000) {
+        timer = object : CountDownTimer(60000, 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 binding.tvTimer.text = "${millisUntilFinished / 1000}s"
             }
@@ -93,6 +103,7 @@ class LearnWordsFragment : Fragment() {
         if (isAnswered) return
 
         isAnswered = true
+        totalWordsCount++
 
         if (trainer.checkAnswer(answerIndex)) {
             markAnswerCorrect(answerView)
@@ -106,15 +117,12 @@ class LearnWordsFragment : Fragment() {
 
     private fun showNextQuestion(trainer: LearnWordsTrainer) {
         val firstQuestion: Question? = trainer.getNextQuestion()
-        isAnswered = false
-        totalWordsCount++
 
         with(binding) {
             if (firstQuestion == null || firstQuestion.variants.size < NUMBER_OF_ANSWERS) {
-                tvCurrentWord.isVisible = false
-                llVariants.isVisible = false
-                btnSkip.text = "Complete"
+                openTrainingResult()
             } else {
+                isAnswered = false
                 btnSkip.isVisible = true
                 tvCurrentWord.isVisible = true
                 tvCurrentWord.text = firstQuestion.correctAnswer.original
@@ -131,7 +139,6 @@ class LearnWordsFragment : Fragment() {
                 }
             }
         }
-
     }
 
     private fun markAnswerNeutral(answerView: AnswerView) {
@@ -169,17 +176,19 @@ class LearnWordsFragment : Fragment() {
             R.drawable.shape_rounded_containers_wrong
         )
 
-        answerView.number.background = ContextCompat.getDrawable(
-            requireContext(),
-            R.drawable.shape_rounded_variants_wrong
-        )
-
-        answerView.number.setTextColor(
-            ContextCompat.getColor(
+        answerView.number.apply {
+            background = ContextCompat.getDrawable(
                 requireContext(),
-                R.color.white
+                R.drawable.shape_rounded_variants_wrong
             )
-        )
+
+            setTextColor(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.white
+                )
+            )
+        }
 
         answerView.value.setTextColor(
             ContextCompat.getColor(
@@ -195,17 +204,18 @@ class LearnWordsFragment : Fragment() {
             R.drawable.shape_rounded_containers_correct
         )
 
-        answerView.number.background = ContextCompat.getDrawable(
-            requireContext(),
-            R.drawable.shape_rounded_variants_correct
-        )
-
-        answerView.number.setTextColor(
-            ContextCompat.getColor(
+        answerView.number.apply {
+            background = ContextCompat.getDrawable(
                 requireContext(),
-                R.color.white
+                R.drawable.shape_rounded_variants_correct
             )
-        )
+            setTextColor(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.white
+                )
+            )
+        }
 
         answerView.value.setTextColor(
             ContextCompat.getColor(
