@@ -31,6 +31,9 @@ class LearnedWordsFragment : Fragment() {
         learnedWords = WordsRepository.getLearnedWords()
 
         with(binding) {
+            tvNoLearnedWords.visibility = if (learnedWords.isEmpty()) View.VISIBLE else View.GONE
+            rvLearnedWords.visibility = if (learnedWords.isEmpty()) View.GONE else View.VISIBLE
+
             rvLearnedWords.layoutManager = LinearLayoutManager(requireContext())
             rvLearnedWords.setHasFixedSize(true)
             rvLearnedWords.adapter = LearnedWordsAdapter(learnedWords)

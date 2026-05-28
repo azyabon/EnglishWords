@@ -4,6 +4,8 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import com.azyabon.englishwords.databinding.ActivityMainBinding
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
@@ -17,8 +19,12 @@ class MainActivity : AppCompatActivity() {
         _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        if (savedInstanceState == null) {
-            replaceFragment(HomeFragment())
+        lifecycleScope.launch {
+            WordsRepository.init(this@MainActivity)
+
+            if (savedInstanceState == null) {
+                replaceFragment(HomeFragment())
+            }
         }
 
         with(binding) {
@@ -46,5 +52,10 @@ class MainActivity : AppCompatActivity() {
         val fragmentTransaction = fragmentManager.beginTransaction()
         fragmentTransaction.replace(R.id.flContainer, fragment)
         fragmentTransaction.commit()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
     }
 }

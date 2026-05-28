@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import com.azyabon.englishwords.databinding.FragmentHomeBinding
@@ -32,10 +33,21 @@ class HomeFragment : Fragment() {
             val topicAdapter = TopicsAdapter(
                 topics = WordsRepository.getTopics(),
                 onItemClick = { topicId ->
-                    parentFragmentManager.beginTransaction()
-                        .replace(R.id.flContainer, LearnWordsFragment.newInstance(topicId))
-                        .addToBackStack(null)
-                        .commit()
+                    val learnedCount = WordsRepository.getLearnedWordsCountByTopicId(topicId)
+                    val totalCount = WordsRepository.getTotalWordsCountByTopicId(topicId)
+
+                    if (totalCount > 0 && learnedCount == totalCount) {
+                        AlertDialog.Builder(requireContext())
+                            .setTitle("Theme completed")
+                            .setMessage("You have learned all words in this theme.")
+                            .setPositiveButton("OK", null)
+                            .show()
+                    } else {
+                        parentFragmentManager.beginTransaction()
+                            .replace(R.id.flContainer, LearnWordsFragment.newInstance(topicId))
+                            .addToBackStack(null)
+                            .commit()
+                    }
                 }
             )
 

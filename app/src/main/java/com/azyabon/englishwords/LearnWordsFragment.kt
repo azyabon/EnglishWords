@@ -11,6 +11,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.azyabon.englishwords.databinding.FragmentLearnWordsBinding
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 
 class LearnWordsFragment : Fragment() {
 
@@ -23,6 +25,7 @@ class LearnWordsFragment : Fragment() {
     private var totalWordsCount = 0
     private var isAnswered = false
     private lateinit var answerViews: List<AnswerView>
+
     private data class AnswerView(
         val container: LinearLayout,
         val number: TextView,
@@ -67,12 +70,18 @@ class LearnWordsFragment : Fragment() {
 
         showNextQuestion(trainer)
 
+        binding.pbTimer.max = 60
+        binding.pbTimer.progress = 60
+
         timer = object : CountDownTimer(60000, 1000) {
             override fun onTick(millisUntilFinished: Long) {
-                binding.tvTimer.text = "${millisUntilFinished / 1000}s"
+                val secondsRemaining = ((millisUntilFinished) / 1000).toInt()
+
+                binding.pbTimer.progress = secondsRemaining
             }
 
             override fun onFinish() {
+                binding.pbTimer.progress = 0
                 openTrainingResult()
             }
         }.start()
@@ -90,6 +99,7 @@ class LearnWordsFragment : Fragment() {
             }
 
             btnSkip.setOnClickListener {
+                trainer.skipCurrentQuestion()
                 showNextQuestion(trainer)
             }
         }
@@ -103,14 +113,19 @@ class LearnWordsFragment : Fragment() {
         if (isAnswered) return
 
         isAnswered = true
-        totalWordsCount++
 
         if (trainer.checkAnswer(answerIndex)) {
             markAnswerCorrect(answerView)
             learnedWordsCount++
+
+            viewLifecycleOwner.lifecycleScope.launch {
+                WordsRepository.saveProgress(requireContext())
+            }
+
             showResult(true)
         } else {
             markAnswerWrong(answerView)
+            trainer.skipCurrentQuestion()
             showResult(false)
         }
     }
@@ -123,7 +138,8 @@ class LearnWordsFragment : Fragment() {
                 openTrainingResult()
             } else {
                 isAnswered = false
-                btnSkip.isVisible = true
+                totalWordsCount++
+                btnSkip.isVisible = trainer.getAvailableQuestionsCount() > 1
                 tvCurrentWord.isVisible = true
                 tvCurrentWord.text = firstQuestion.correctAnswer.original
 

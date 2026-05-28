@@ -25,8 +25,12 @@ class LearnWordsTrainer(topicId: String) {
 
     private var currentQuestion: Question? = null
 
+    private val skippedWordIds = mutableSetOf<String>()
+
     fun getNextQuestion(): Question? {
-        val notLearnedList = dictionary.filter { !it.learned }
+        val notLearnedList = dictionary.filter {
+            !it.learned && it.id !in skippedWordIds
+        }
 
         if (notLearnedList.isEmpty()) return null
 
@@ -47,6 +51,12 @@ class LearnWordsTrainer(topicId: String) {
         return currentQuestion
     }
 
+    fun skipCurrentQuestion() {
+        currentQuestion?.correctAnswer?.let {
+            skippedWordIds.add(it.id)
+        }
+    }
+
     fun checkAnswer(userAnswerIndex: Int?): Boolean {
 
         return currentQuestion?.let {
@@ -60,6 +70,12 @@ class LearnWordsTrainer(topicId: String) {
                 false
             }
         } ?: false
+    }
+
+    fun getAvailableQuestionsCount(): Int {
+        return dictionary.count {
+            !it.learned && it.id !in skippedWordIds
+        }
     }
 }
 

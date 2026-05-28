@@ -37,6 +37,14 @@ class TopicsAdapter(
             tvTopicTotalWords.text = "$learnedWord/$totalWords"
             imTopicIcon.setImageResource(topic.icon)
 
+            tvTopicTotalWords.setTextColor(
+                if (learnedWord == totalWords && totalWords > 0) {
+                    root.context.getColor(R.color.correctAnswerColor)
+                } else {
+                    root.context.getColor(R.color.primaryColor)
+                }
+            )
+
             topicCard.setOnClickListener {
                 onItemClick(topic.id)
             }

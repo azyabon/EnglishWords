@@ -19,17 +19,23 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/tvTimer"
-        android:layout_width="wrap_content"
+    <ProgressBar
+        android:id="@+id/pbTimer"
+        style="@android:style/Widget.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="64dp"
+        android:layout_marginTop="22dp"
+        android:indeterminate="false"
+        android:max="60"
+        android:progress="60"
+        android:progressBackgroundTint="@color/textVariantsColor"
+        android:progressBackgroundTintMode="src_atop"
+        android:progressTint="@color/primaryColor"
+        android:progressTintMode="src_atop"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="20dp"
-        android:fontFamily="@font/nunito_semi_bold"
-        android:textSize="16sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="60s" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/tvCurrentWord"
@@ -42,7 +48,7 @@
         android:textSize="50sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvTimer"
+        app:layout_constraintTop_toBottomOf="@+id/pbTimer"
         tools:text="Galaxy" />
 
     <LinearLayout

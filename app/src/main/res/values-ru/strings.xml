@@ -8,4 +8,5 @@
     <string name="training_result">Результат Тренировки</string>
     <string name="finish">Закончить</string>
     <string name="themes">Темы</string>
+    <string name="no_learned_words_yet">Пока нет выученных слов</string>
 </resources>
