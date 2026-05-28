@@ -5,8 +5,10 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.azyabon.englishwords.databinding.LearnedWordItemBinding
 
-class LearnedWordsAdapter(private val words: List<Word>) :
+class LearnedWordsAdapter(words: List<Word>) :
     RecyclerView.Adapter<LearnedWordsAdapter.LearnedWordViewHolder>() {
+
+    private val words = words.toMutableList()
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -19,6 +21,15 @@ class LearnedWordsAdapter(private val words: List<Word>) :
                 false
             )
         )
+    }
+
+    fun deleteItem(position: Int) {
+        val word = words[position]
+
+        WordsRepository.deleteLearnedWord(word.id)
+        words.removeAt(position)
+
+        notifyItemRemoved(position)
     }
 
     override fun onBindViewHolder(

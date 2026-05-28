@@ -48,6 +48,9 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
 
+    // Swipe
+    implementation("it.xabaras.android:recyclerview-swipedecorator:1.4")
+
     // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

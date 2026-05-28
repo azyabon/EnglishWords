@@ -1,7 +1,9 @@
 package com.azyabon.englishwords
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -57,6 +59,10 @@ class LearnWordsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        requireContext().startService(
+            Intent(requireContext(), CounterService::class.java)
+        )
+
         val topicId: String = arguments?.getString(ARG_TOPIC_ID) ?: ""
 
         answerViews = listOf(
@@ -96,6 +102,9 @@ class LearnWordsFragment : Fragment() {
 
             ibClose.setOnClickListener {
                 parentFragmentManager.popBackStack()
+                requireContext().stopService(
+                    Intent(requireContext(), CounterService::class.java)
+                )
             }
 
             btnSkip.setOnClickListener {
@@ -281,6 +290,7 @@ class LearnWordsFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        Log.d("LearnWordsFragment", "onDestroyView: LearnWordsFragment")
         timer?.cancel()
         timer = null
         _binding = null

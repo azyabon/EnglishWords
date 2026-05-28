@@ -125,6 +125,13 @@ object WordsRepository {
         }
     }
 
+    fun deleteLearnedWord(wordId: String) {
+        topics
+            .flatMap { it.words }
+            .find { it.id == wordId }
+            ?.learned = false
+    }
+
     fun getTopics(): List<Topic> = topics
 
     fun getWordsByTopicId(topicId: String): List<Word> {
